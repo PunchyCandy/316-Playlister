@@ -27,6 +27,10 @@ export default function App() {
     setCurrentScreen("home");
   };
 
+  const handleNavigate = (screen) => {
+    setCurrentScreen(screen);
+  };
+
   const handleLogout = () => {
     setCurrentUser(null);
     setCurrentScreen("welcome");
@@ -56,6 +60,7 @@ export default function App() {
           onLoginClick={goToLogin}
           onCreateAccountClick={goToCreateAccount}
           onEditAccountClick={goToEditAccount}
+          onNavigate={handleNavigate}
           onLogout={handleLogout}
         />
 
