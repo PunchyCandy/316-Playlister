@@ -20,6 +20,7 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState("welcome");
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [accountTab, setAccountTab] = useState(0);
 
   const handleLogin = (user) => {
     setCurrentUser(user);
@@ -44,14 +45,23 @@ export default function App() {
         {currentScreen === "welcome" && (
           <WelcomeScreen
             onContinueAsGuest={() => setCurrentScreen("home")}
-            onLogin={() => setCurrentScreen("account")}
-            onCreateAccount={() => setCurrentScreen("account")}
+            onLogin={() => {
+              setAccountTab(1);
+              setCurrentScreen("account");
+            }}
+            onCreateAccount={() => {
+              setAccountTab(0);
+              setCurrentScreen("account");
+            }}
           />
         )}
 
 
         {currentScreen === "account" && (
-          <AccountScreen onLogin={handleLogin} />
+          <AccountScreen
+            initialTab={accountTab}
+            onLogin={handleLogin}
+          />
         )}
 
         {currentScreen === "home" && (
