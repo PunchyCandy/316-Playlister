@@ -32,15 +32,33 @@ export default function App() {
     setCurrentScreen("welcome");
   };
 
+  const goToLogin = () => {
+    setAccountTab(1);                 // login tab
+    setCurrentScreen("account");      // go to account screen
+  };
+
+  const goToCreateAccount = () => {
+    setAccountTab(0);                 // create account tab
+    setCurrentScreen("account");
+  };
+
+  const goToEditAccount = () => {
+    setCurrentScreen("edit-account"); // or whatever screen you create later
+  };
+
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ minHeight: "100vh", bgcolor: "#f2f5f9" }}>
         <AppBanner
           user={currentUser}
+          onLoginClick={goToLogin}
+          onCreateAccountClick={goToCreateAccount}
+          onEditAccountClick={goToEditAccount}
           onLogout={handleLogout}
-          onNavigate={setCurrentScreen}
         />
+
 
         {currentScreen === "welcome" && (
           <WelcomeScreen

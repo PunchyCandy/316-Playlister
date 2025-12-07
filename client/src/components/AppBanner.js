@@ -10,7 +10,7 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import ProfileIcon from "./ProfileIcon";
 
-export default function AppBanner({ user, onLogout, onNavigate }) {
+export default function AppBanner({ user, onLogout, onNavigate, onLoginClick, onCreateAccountClick, onEditAccountClick }) {
   return (
     <AppBar position="static" color="primary" sx={{ mb: 2 }}>
       <Toolbar>
@@ -40,7 +40,13 @@ export default function AppBanner({ user, onLogout, onNavigate }) {
             </>
           )}
 
-          <ProfileIcon user={user} onLogout={onLogout} />
+          <ProfileIcon
+            user={user}
+            onLoginClick={onLoginClick}
+            onCreateAccountClick={onCreateAccountClick}
+            onEditAccountClick={onEditAccountClick}
+            onLogout={onLogout}
+          />
         </Box>
       </Toolbar>
     </AppBar>
