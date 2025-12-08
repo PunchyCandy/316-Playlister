@@ -35,7 +35,7 @@ export default function AppBanner({
             <>
               <Button
                 color="inherit"
-                onClick={() => onNavigate("home")}
+                onClick={() => onNavigate("playlists")}
               >
                 Playlists
               </Button>

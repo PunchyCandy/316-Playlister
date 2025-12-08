@@ -86,8 +86,12 @@ export default function App() {
   };
 
   const handleNavigate = (screen) => {
-    if (screen === "home") {
+    if (screen === "home") {            // triggered by home icon
       setCurrentScreen(currentUser ? "home" : "welcome");
+      return;
+    }
+    if (screen === "playlists") {       // playlists button
+      setCurrentScreen("home");
       return;
     }
     setCurrentScreen(screen);
