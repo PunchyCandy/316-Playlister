@@ -113,14 +113,15 @@ router.get("/me", authRequired, async (req, res) => {
 router.put("/me", authRequired, async (req, res) => {
   try {
     const { username, email, password, avatar } = req.body;
+    const emailNormalized = (email || "").trim().toLowerCase();
 
-    if (!username || !email) {
+    if (!username || !emailNormalized) {
       return res.status(400).json({ error: "username and email are required" });
     }
 
     // ensure email uniqueness if changed
-    if (email !== req.user.email) {
-      const exists = await User.findOne({ email });
+    if (emailNormalized !== (req.user.email || "").toLowerCase()) {
+      const exists = await User.findOne({ email: emailNormalized });
       if (exists) {
         return res.status(409).json({ error: "Email already in use" });
       }
@@ -128,7 +129,7 @@ router.put("/me", authRequired, async (req, res) => {
 
     const updates = {
       userName: username,
-      email,
+      email: emailNormalized,
       avatar: typeof avatar === "string" ? avatar : req.user.avatar
     };
 

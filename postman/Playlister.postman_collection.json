@@ -1,0 +1,230 @@
+{
+  "info": {
+    "_postman_id": "c5cb1b17-fake-4be6-9e8c-collection",
+    "name": "Playlister API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Local Playlister API requests for auth, playlists, and songs."
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"pass1234\",\n  \"avatar\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"pass1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Current User (me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Playlists",
+      "item": [
+        {
+          "name": "List Playlists",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/playlists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "playlists"]
+            }
+          }
+        },
+        {
+          "name": "Create Playlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/playlists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "playlists"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Playlist\",\n  \"ownerEmail\": \"alice@example.com\",\n  \"songs\": [],\n  \"listeners\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Playlist",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/playlists/{{playlistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "playlists", "{{playlistId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"songs\": [\"{{songId}}\"],\n  \"listeners\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Playlist",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/playlists/{{playlistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "playlists", "{{playlistId}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Song to Playlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/playlists/{{playlistId}}/songs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "playlists", "{{playlistId}}", "songs"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"songId\": \"{{songId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove Song from Playlist",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/playlists/{{playlistId}}/songs/{{songId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "playlists", "{{playlistId}}", "songs", "{{songId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Songs",
+      "item": [
+        {
+          "name": "List Songs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/songs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "songs"]
+            }
+          }
+        },
+        {
+          "name": "Create Song",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/songs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "songs"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ownerEmail\": \"alice@example.com\",\n  \"title\": \"Song Title\",\n  \"artist\": \"Artist Name\",\n  \"year\": \"2024\",\n  \"youtubeId\": \"abc123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Song",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/songs/{{songId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "songs", "{{songId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Title\",\n  \"artist\": \"New Artist\",\n  \"year\": \"2023\",\n  \"youtubeId\": \"xyz789\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Song",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/songs/{{songId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "songs", "{{songId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "playlistId", "value": "" },
+    { "key": "songId", "value": "" }
+  ]
+}

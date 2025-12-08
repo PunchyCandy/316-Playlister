@@ -87,7 +87,7 @@ export default function App() {
 
   const handleNavigate = (screen) => {
     if (screen === "home") {
-      setCurrentScreen("home");
+      setCurrentScreen(currentUser ? "home" : "welcome");
       return;
     }
     setCurrentScreen(screen);
