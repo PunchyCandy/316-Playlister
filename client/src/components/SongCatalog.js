@@ -1,205 +1,304 @@
+// src/components/SongCatalogScreen.js
 import React, { useState } from "react";
 import {
   Box,
   Paper,
-  TextField,
-  InputAdornment,
-  IconButton,
   Typography,
-  Grid,
-  Menu,
-  MenuItem,
+  TextField,
+  Stack,
   Button,
-  List,
-  ListItemButton,
-  ListItemText,
-  ListItemSecondaryAction
+  MenuItem,
+  IconButton
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import SortIcon from "@mui/icons-material/Sort";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const dummySongs = [
-  { id: 1, title: "Song A", artist: "Artist 1" },
-  { id: 2, title: "Song B", artist: "Artist 2" },
-  { id: 3, title: "Song C", artist: "Artist 3" }
+  {
+    id: 1,
+    title: "Fast Train",
+    artist: "Solomon Burke",
+    year: 1985,
+    listens: 1234567,
+    playlists: 123,
+    videoUrl: "https://www.youtube.com/embed/b7ZBz6m5i9w"
+  },
+  {
+    id: 2,
+    title: "I Wish I Knew",
+    artist: "Solomon Burke",
+    year: 1968,
+    listens: 4567,
+    playlists: 3,
+    videoUrl: "https://www.youtube.com/embed/b7ZBz6m5i9w"
+  }
 ];
 
-export default function SongCatalog({ onBack, playlist }) {
-  const [searchText, setSearchText] = useState("");
-  const [sortAnchor, setSortAnchor] = useState(null);
-  const [selectedSong, setSelectedSong] = useState(null);
+export default function SongCatalogScreen({ onBackToPlaylists }) {
+  const [filters, setFilters] = useState({
+    title: "",
+    artist: "",
+    year: ""
+  });
+  const [sortBy, setSortBy] = useState("listens-desc");
+  const [selectedSong, setSelectedSong] = useState(dummySongs[0] || null);
 
-  const filtered = dummySongs.filter((s) =>
-    s.title.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const handleFilterChange = (field) => (e) => {
+    setFilters((prev) => ({ ...prev, [field]: e.target.value }));
+  };
 
-  const openSortMenu = Boolean(sortAnchor);
+  const clearFilters = () =>
+    setFilters({
+      title: "",
+      artist: "",
+      year: ""
+    });
 
-  return (
-    <Box sx={{ px: 2, pb: 4 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <Typography variant="h5">
-          Song Catalog{" "}
-          {playlist ? `– Add to "${playlist.name}"` : ""}
-        </Typography>
-        <Button onClick={onBack}>Back to Playlists</Button>
-      </Box>
-
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={5}>
-          {/* SearchSong + SortSongs */}
-          <Paper sx={{ p: 2, mb: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Search Songs
-            </Typography>
-
-            <TextField
-              fullWidth
-              placeholder="Search by title or artist..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={(e2) => setSortAnchor(e2.currentTarget)}>
-                      <SortIcon />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
-
-            <Menu
-              anchorEl={sortAnchor}
-              open={openSortMenu}
-              onClose={() => setSortAnchor(null)}
-            >
-              <MenuItem onClick={() => setSortAnchor(null)}>
-                Title (A–Z)
-              </MenuItem>
-              <MenuItem onClick={() => setSortAnchor(null)}>
-                Artist (A–Z)
-              </MenuItem>
-            </Menu>
-          </Paper>
-
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Results
-            </Typography>
-
-            <List dense>
-              {filtered.map((song) => (
-                <ListItemButton
-                  key={song.id}
-                  onClick={() => setSelectedSong(song)}
-                  selected={selectedSong?.id === song.id}
-                >
-                  <ListItemText
-                    primary={song.title}
-                    secondary={song.artist}
-                  />
-                  {playlist && (
-                    <ListItemSecondaryAction>
-                      <IconButton edge="end">
-                        <AddIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItemButton>
-              ))}
-            </List>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={7}>
-          {/* SongPage: EditSong + RemoveSong area */}
-          <Paper sx={{ p: 2, minHeight: 300 }}>
-            <Typography variant="h6" gutterBottom>
-              Song Details
-            </Typography>
-
-            {selectedSong ? (
-              <SongDetail song={selectedSong} />
-            ) : (
-              <Typography variant="body2">
-                Select a song from the catalog to view or edit details.
-              </Typography>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
-    </Box>
-  );
-}
-
-function SongDetail({ song }) {
-  const [values, setValues] = useState({
-    title: song.title,
-    artist: song.artist
+  // basic filter by title/artist/year text
+  const filtered = dummySongs.filter((song) => {
+    const titleMatch = song.title
+      .toLowerCase()
+      .includes(filters.title.toLowerCase());
+    const artistMatch = song.artist
+      .toLowerCase()
+      .includes(filters.artist.toLowerCase());
+    const yearMatch = filters.year
+      ? String(song.year).includes(filters.year)
+      : true;
+    return titleMatch && artistMatch && yearMatch;
   });
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
-  const handleSave = () => {
-    // TODO: implement edit song API
-    console.log("Save song", values);
-  };
-
-  const handleRemove = () => {
-    // TODO: implement remove song API
-    console.log("Remove song", song.id);
-  };
+  const sorted = [...filtered].sort((a, b) => {
+    switch (sortBy) {
+      case "listens-desc":
+        return b.listens - a.listens;
+      case "listens-asc":
+        return a.listens - b.listens;
+      case "title-asc":
+        return a.title.localeCompare(b.title);
+      case "title-desc":
+        return b.title.localeCompare(a.title);
+      default:
+        return 0;
+    }
+  });
 
   return (
-    <>
-      <TextField
-        fullWidth
-        margin="normal"
-        name="title"
-        label="Title"
-        value={values.title}
-        onChange={handleChange}
-      />
-      <TextField
-        fullWidth
-        margin="normal"
-        name="artist"
-        label="Artist"
-        value={values.artist}
-        onChange={handleChange}
-      />
+    <Box
+      sx={{
+        mt: 2,
+        px: 2,
+        pb: 4,
+        height: "calc(100vh - 64px)",
+        display: "flex",
+        gap: 3
+      }}
+    >
+      {/* LEFT SIDE – search + video */}
+      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+        <Paper sx={{ p: 2 }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", mb: 2, color: "#d100d1" }}
+          >
+            Songs Catalog
+          </Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<EditIcon />}
-          onClick={handleSave}
-        >
-          Save Changes
-        </Button>
-        <Button
-          color="error"
-          variant="outlined"
-          startIcon={<DeleteIcon />}
-          onClick={handleRemove}
-        >
-          Remove Song
-        </Button>
+          <Stack spacing={2}>
+            <TextField
+              fullWidth
+              label="by Title"
+              value={filters.title}
+              onChange={handleFilterChange("title")}
+            />
+            <TextField
+              fullWidth
+              label="by Artist"
+              value={filters.artist}
+              onChange={handleFilterChange("artist")}
+            />
+            <TextField
+              fullWidth
+              label="by Year"
+              value={filters.year}
+              onChange={handleFilterChange("year")}
+            />
+
+            <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+              <Button
+                variant="contained"
+                fullWidth
+                sx={{ textTransform: "none" }}
+              >
+                <SearchIcon sx={{ mr: 1 }} />
+                Search
+              </Button>
+              <Button
+                variant="outlined"
+                fullWidth
+                sx={{ textTransform: "none" }}
+                onClick={clearFilters}
+              >
+                Clear
+              </Button>
+            </Box>
+          </Stack>
+        </Paper>
+
+        {/* Video player / preview */}
+        <Paper sx={{ p: 1, flex: 1, minHeight: 220 }}>
+          {selectedSong ? (
+            <Box
+              sx={{
+                position: "relative",
+                paddingTop: "56.25%" // 16:9 ratio
+              }}
+            >
+              <iframe
+                title={selectedSong.title}
+                src={selectedSong.videoUrl}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: 0
+                }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </Box>
+          ) : (
+            <Typography variant="body2">
+              Select a song on the right to preview the video.
+            </Typography>
+          )}
+        </Paper>
       </Box>
-    </>
+
+      {/* RIGHT SIDE – songs list */}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2
+        }}
+      >
+        <Paper sx={{ p: 2, flex: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2
+            }}
+          >
+            <Box>
+              <Typography variant="subtitle1" component="span">
+                Sort:{" "}
+              </Typography>
+              <TextField
+                select
+                size="small"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                sx={{ minWidth: 170 }}
+              >
+                <MenuItem value="listens-desc">Listens (Hi–Lo)</MenuItem>
+                <MenuItem value="listens-asc">Listens (Lo–Hi)</MenuItem>
+                <MenuItem value="title-asc">Title (A–Z)</MenuItem>
+                <MenuItem value="title-desc">Title (Z–A)</MenuItem>
+              </TextField>
+            </Box>
+
+            <Typography variant="subtitle1">
+              {sorted.length} Song{sorted.length !== 1 && "s"}
+            </Typography>
+          </Box>
+
+          {/* Song cards */}
+          <Stack spacing={2}>
+            {sorted.map((song) => (
+              <Paper
+                key={song.id}
+                sx={{
+                  borderLeft: "4px solid #ff9800",
+                  p: 1.5,
+                  cursor: "pointer",
+                  "&:hover": { boxShadow: 3 }
+                }}
+                onClick={() => setSelectedSong(song)}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <Box>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: "bold" }}
+                    >
+                      {song.title} ({song.year})
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                      {song.artist}
+                    </Typography>
+                  </Box>
+                  <IconButton>
+                    <MoreVertIcon />
+                  </IconButton>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mt: 1
+                  }}
+                >
+                  <Typography variant="caption">
+                    Listens: {song.listens.toLocaleString()}
+                  </Typography>
+                  <Typography variant="caption">
+                    Playlists: {song.playlists}
+                  </Typography>
+                </Box>
+              </Paper>
+            ))}
+          </Stack>
+
+          {/* New Song button */}
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{ textTransform: "none" }}
+              // later: onClick={onNewSong}
+            >
+              New Song
+            </Button>
+          </Box>
+        </Paper>
+
+        {/* Back to playlists link (optional) */}
+        {onBackToPlaylists && (
+          <Box sx={{ textAlign: "right" }}>
+            <Button
+              variant="text"
+              sx={{ textTransform: "none" }}
+              onClick={onBackToPlaylists}
+            >
+              Back to Playlists
+            </Button>
+          </Box>
+        )}
+      </Box>
+    </Box>
   );
 }
