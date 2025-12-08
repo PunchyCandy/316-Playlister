@@ -573,7 +573,6 @@ export default function HomeScreen({
               listeners: updated.listeners || []
             });
 
-            // keep songs as full objects if we already have them
             const merged = { ...updatedPayload, songs: updated.songs || [] };
 
             setPlaylists((prev) =>
@@ -586,6 +585,10 @@ export default function HomeScreen({
             return;
           }
           setEditing(null);
+        }}
+        onAddSongFromCatalog={() => {
+          setEditing(null);
+          onOpenSongCatalog && onOpenSongCatalog();
         }}
       />
 

@@ -41,3 +41,19 @@ export async function deletePlaylist(id) {
   });
   return handleResponse(res);
 }
+
+export async function addSongToPlaylist({ playlistId, songId }) {
+  const res = await fetch(`${BASE_URL}/playlists/${playlistId}/songs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ songId })
+  });
+  return handleResponse(res);
+}
+
+export async function removeSongFromPlaylist({ playlistId, songId }) {
+  const res = await fetch(`${BASE_URL}/playlists/${playlistId}/songs/${songId}`, {
+    method: "DELETE"
+  });
+  return handleResponse(res);
+}

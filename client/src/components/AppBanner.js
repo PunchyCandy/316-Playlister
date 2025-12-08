@@ -10,7 +10,15 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import ProfileIcon from "./ProfileIcon";
 
-export default function AppBanner({ user, onLogout, onNavigate, onLoginClick, onCreateAccountClick, onEditAccountClick }) {
+export default function AppBanner({
+  user,
+  currentScreen,
+  onLogout,
+  onNavigate,
+  onLoginClick,
+  onCreateAccountClick,
+  onEditAccountClick
+}) {
   return (
     <AppBar position="static" color="primary" sx={{ mb: 2 }}>
       <Toolbar>
@@ -23,7 +31,7 @@ export default function AppBanner({ user, onLogout, onNavigate, onLoginClick, on
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {user && (
+          {currentScreen !== "welcome" && (
             <>
               <Button
                 color="inherit"

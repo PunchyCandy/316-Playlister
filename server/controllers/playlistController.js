@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Playlist = require("../models/playlist");
+const Song = require("../models/song");
 
 // ---- PLAYLIST CRUD (Mongo) ---- //
 exports.getAllPlaylists = async (req, res) => {
@@ -156,6 +157,15 @@ exports.deletePlaylist = async (req, res) => {
   try {
     const deleted = await Playlist.findByIdAndDelete(req.params.id).lean();
     if (!deleted) return res.status(404).json({ error: "Playlist not found" });
+
+    // decrement playlists count on all songs that were in this playlist
+    if (Array.isArray(deleted.songs) && deleted.songs.length > 0) {
+      await Song.updateMany(
+        { _id: { $in: deleted.songs } },
+        { $inc: { playlists: -1 } }
+      );
+    }
+
     res.json(deleted);
   } catch (err) {
     console.error("deletePlaylist error:", err);
@@ -172,9 +182,18 @@ exports.addSongToPlaylist = async (req, res) => {
     const playlist = await Playlist.findById(req.params.id);
     if (!playlist) return res.status(404).json({ error: "Playlist not found" });
 
+    const song = await Song.findById(songId);
+    if (!song) return res.status(404).json({ error: "Song not found" });
+
+    let added = false;
     if (!playlist.songs.find((id) => id.toString() === songId.toString())) {
       playlist.songs.push(songId);
+      added = true;
       await playlist.save();
+    }
+
+    if (added) {
+      await Song.findByIdAndUpdate(songId, { $inc: { playlists: 1 } });
     }
 
     res.status(201).json(playlist);
@@ -190,10 +209,16 @@ exports.removeSongFromPlaylist = async (req, res) => {
     const playlist = await Playlist.findById(id);
     if (!playlist) return res.status(404).json({ error: "Playlist not found" });
 
+    const beforeLength = playlist.songs.length;
     playlist.songs = playlist.songs.filter(
       (s) => s.toString() !== songId.toString()
     );
+    const removed = playlist.songs.length < beforeLength;
     await playlist.save();
+
+    if (removed) {
+      await Song.findByIdAndUpdate(songId, { $inc: { playlists: -1 } });
+    }
 
     res.json(playlist);
   } catch (err) {

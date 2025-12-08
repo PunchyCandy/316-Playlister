@@ -60,7 +60,7 @@ export default function App() {
 
   const handleNavigate = (screen) => {
     if (screen === "home") {
-      setCurrentScreen(currentUser ? "home" : "welcome");
+      setCurrentScreen("home");
       return;
     }
     setCurrentScreen(screen);
@@ -87,6 +87,10 @@ export default function App() {
     setCurrentScreen("edit-account"); // or whatever screen you create later
   };
 
+  const goToSongCatalog = () => {
+    setCurrentScreen("catalog");
+  };
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -94,6 +98,7 @@ export default function App() {
       <Box sx={{ minHeight: "100vh", bgcolor: "#f2f5f9" }}>
         <AppBanner
           user={currentUser}
+          currentScreen={currentScreen}
           onLoginClick={goToLogin}
           onCreateAccountClick={goToCreateAccount}
           onEditAccountClick={goToEditAccount}
@@ -127,7 +132,7 @@ export default function App() {
         {currentScreen === "home" && (
           <HomeScreen
             user={currentUser}
-            onOpenSongCatalog={() => setCurrentScreen("catalog")}
+            onOpenSongCatalog={goToSongCatalog}
             selectedPlaylist={selectedPlaylist}
             setSelectedPlaylist={setSelectedPlaylist}
           />
@@ -145,6 +150,8 @@ export default function App() {
         {currentScreen === "catalog" && (
           <SongCatalog
             onBack={() => setCurrentScreen("home")}
+            user={currentUser}
+            token={authToken}
             playlist={selectedPlaylist}
           />
         )}
