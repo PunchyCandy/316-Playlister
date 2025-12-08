@@ -20,11 +20,26 @@ exports.createSong = async (req, res) => {
         .json({ error: "ownerEmail, title, and artist are required" });
     }
 
+    const titleVal = title.trim();
+    const artistVal = artist.trim();
+    const yearVal = (year ?? "").toString().trim();
+
+    const existing = await Song.findOne({
+      title: titleVal,
+      artist: artistVal,
+      year: yearVal
+    });
+    if (existing) {
+      return res
+        .status(409)
+        .json({ error: "Song with this title, artist, and year already exists" });
+    }
+
     const song = await Song.create({
       ownerEmail,
-      title,
-      artist,
-      year: year || "",
+      title: titleVal,
+      artist: artistVal,
+      year: yearVal,
       youtubeId: youtubeId || ""
     });
 
@@ -45,11 +60,31 @@ exports.updateSong = async (req, res) => {
     }
 
     const { title, artist, year, youtubeId } = req.body;
-    const update = {};
-    if (title !== undefined) update.title = title;
-    if (artist !== undefined) update.artist = artist;
-    if (year !== undefined) update.year = year;
-    if (youtubeId !== undefined) update.youtubeId = youtubeId;
+    const nextTitle = title !== undefined ? title.trim() : song.title;
+    const nextArtist = artist !== undefined ? artist.trim() : song.artist;
+    const nextYear =
+      year !== undefined ? (year ?? "").toString().trim() : song.year;
+    const nextYoutube = youtubeId !== undefined ? youtubeId : song.youtubeId;
+
+    // check duplicate combination
+    const dupe = await Song.findOne({
+      _id: { $ne: song._id },
+      title: nextTitle,
+      artist: nextArtist,
+      year: nextYear
+    });
+    if (dupe) {
+      return res
+        .status(409)
+        .json({ error: "Song with this title, artist, and year already exists" });
+    }
+
+    const update = {
+      title: nextTitle,
+      artist: nextArtist,
+      year: nextYear,
+      youtubeId: nextYoutube
+    };
 
     const updated = await Song.findByIdAndUpdate(req.params.id, update, {
       new: true

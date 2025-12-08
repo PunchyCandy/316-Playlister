@@ -419,16 +419,22 @@ export default function HomeScreen({
                             const created = await createPlaylist({
                               name: newName,
                               ownerEmail: user.email,
-                              songs: songs.map((s) => s._id || s.id || s),
-                              listeners: []
-                            });
-                            setPlaylists((prev) => [...prev, created]);
-                            setEditing(created);
-                          } catch (err) {
-                            alert(err.message || "Failed to copy playlist");
-                          }
-                        }}
-                      >
+                        songs: songs.map((s) => s._id || s.id || s),
+                        listeners: []
+                      });
+                      const withOwner = {
+                        ...created,
+                        ownerUsername: user.username || user.userName || user.email,
+                        ownerAvatar: user.avatar,
+                        ownerEmail: user.email
+                      };
+                      setPlaylists((prev) => [...prev, withOwner]);
+                      setEditing(withOwner);
+                    } catch (err) {
+                      alert(err.message || "Failed to copy playlist");
+                    }
+                  }}
+                >
                         Copy
                       </Button>
                       <Button
@@ -543,8 +549,14 @@ export default function HomeScreen({
                     songs: [],
                     listeners: []
                   });
-                  setPlaylists((prev) => [...prev, created]);
-                  setEditing(created);
+                  const withOwner = {
+                    ...created,
+                    ownerUsername: user.username || user.userName || user.email,
+                    ownerAvatar: user.avatar,
+                    ownerEmail: user.email
+                  };
+                  setPlaylists((prev) => [...prev, withOwner]);
+                  setEditing(withOwner);
                 } catch (err) {
                   alert(err.message || "Failed to create playlist");
                 }

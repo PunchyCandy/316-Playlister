@@ -10,7 +10,8 @@ import {
   Typography,
   IconButton,
   Button,
-  Paper
+  Paper,
+  Divider
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -130,13 +131,19 @@ export default function EditPlaylistModal({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle
-        sx={{ bgcolor: "#2e7d32", color: "#fff", fontWeight: 700, pb: 1 }}
+        sx={{
+          bgcolor: "#ffffff",
+          color: "#0f172a",
+          fontWeight: 800,
+          letterSpacing: 0.5,
+          borderBottom: "1px solid #e5e7eb"
+        }}
       >
         Edit Playlist
       </DialogTitle>
       <DialogContent
         sx={{
-          bgcolor: "#cff9d5",
+          bgcolor: "#f7f7f9",
           pt: 2,
           display: "flex",
           flexDirection: "column",
@@ -150,15 +157,16 @@ export default function EditPlaylistModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             InputProps={{
-              sx: { bgcolor: "#e8e8e8", fontSize: 20, fontWeight: 600 }
+              sx: { bgcolor: "#ffffff", fontSize: 20, fontWeight: 700 }
             }}
           />
           <IconButton
             color="primary"
             sx={{
-              bgcolor: "#7c4dff",
+              bgcolor: "#0f766e",
               color: "#fff",
-              "&:hover": { bgcolor: "#5e35b1" }
+              "&:hover": { bgcolor: "#0d5f59" },
+              boxShadow: "0 6px 18px rgba(15,118,110,0.25)"
             }}
             onClick={handleAddSong}
           >
@@ -172,8 +180,11 @@ export default function EditPlaylistModal({
             minHeight: 260,
             maxHeight: 360,
             overflow: "auto",
-            p: 1,
-            bgcolor: "#fffef5"
+            p: 1.5,
+            bgcolor: "#ffffff",
+            borderColor: "#e5e7eb",
+            borderRadius: 3,
+            boxShadow: "0 6px 20px rgba(15, 118, 110, 0.08)"
           }}
         >
           <Stack spacing={1.2}>
@@ -181,12 +192,15 @@ export default function EditPlaylistModal({
               <Paper
                 key={`${song._id || idx}-${idx}`}
                 sx={{
-                  p: 1,
-                  bgcolor: "#fdf0a8",
+                  p: 1.25,
+                  bgcolor: "#f9fafb",
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
-                  cursor: "grab"
+                  cursor: "grab",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 2,
+                  boxShadow: "0 4px 12px rgba(15,118,110,0.08)"
                 }}
                 draggable
                 onDragStart={() => setDragIndex(idx)}
@@ -194,10 +208,10 @@ export default function EditPlaylistModal({
                 onDrop={() => handleDrop(idx)}
               >
                 <Typography
-                  sx={{ fontWeight: 700, minWidth: 28 }}
+                  sx={{ fontWeight: 800, minWidth: 28, color: "#0f172a" }}
                 >{`${idx + 1}.`}</Typography>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography fontWeight={700} noWrap>
+                  <Typography fontWeight={700} noWrap color="#0f172a">
                     {song.title || "Untitled"}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" noWrap>
@@ -227,14 +241,17 @@ export default function EditPlaylistModal({
           </Stack>
         </Paper>
       </DialogContent>
-      <DialogActions sx={{ bgcolor: "#cff9d5", pb: 2, pr: 3 }}>
-        <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
+      <DialogActions
+        sx={{ bgcolor: "#f7f7f9", pb: 2, pr: 3, borderTop: "1px solid #e0e7ef" }}
+      >
+        <Stack direction="row" spacing={2} sx={{ width: "100%", alignItems: "center" }}>
           <Stack direction="row" spacing={1}>
             <Button
               variant="outlined"
               startIcon={<UndoIcon />}
               onClick={handleUndo}
               disabled={undoStack.length === 0}
+              sx={{ borderColor: "#d1d5db", color: "#1f2933" }}
             >
               Undo
             </Button>
@@ -243,16 +260,22 @@ export default function EditPlaylistModal({
               startIcon={<RedoIcon />}
               onClick={handleRedo}
               disabled={redoStack.length === 0}
+              sx={{ borderColor: "#d1d5db", color: "#1f2933" }}
             >
               Redo
             </Button>
           </Stack>
-          <Box sx={{ flex: 1 }} />
+          <Divider flexItem sx={{ mx: 1, borderColor: "#e5e7eb" }} />
           <Stack direction="row" spacing={1}>
             <Button variant="outlined" color="inherit" onClick={onClose}>
               Close
             </Button>
-            <Button variant="contained" color="success" onClick={handleSave}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSave}
+              sx={{ bgcolor: "#0f766e", "&:hover": { bgcolor: "#0d5f59" } }}
+            >
               Save
             </Button>
           </Stack>

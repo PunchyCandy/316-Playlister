@@ -13,8 +13,35 @@ import { fetchCurrentUser } from "./api/authApi";
 const theme = createTheme({
   palette: {
     mode: "light",
-    primary: { main: "#1976d2" },
-    secondary: { main: "#ff9800" }
+    primary: { main: "#0f766e" },      // teal
+    secondary: { main: "#f59e0b" },    // amber
+    background: {
+      default: "#f7f7f9",
+      paper: "#ffffff"
+    },
+    text: {
+      primary: "#1f2933",
+      secondary: "#52606d"
+    }
+  },
+  shape: { borderRadius: 10 },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          borderRadius: 12
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+          boxShadow: "0 6px 20px rgba(15, 118, 110, 0.08)"
+        }
+      }
+    }
   }
 });
 
