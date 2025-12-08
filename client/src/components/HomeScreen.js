@@ -289,7 +289,7 @@ export default function HomeScreen({
                 <MenuItem value="listeners-asc">Listeners (Lo–Hi)</MenuItem>
               </TextField>
 
-              <Typography variant="body2">
+              <Typography variant="body2" color="text.secondary">
                 {sorted.length} playlist{sorted.length !== 1 && "s"}
               </Typography>
             </Box>
@@ -344,7 +344,7 @@ export default function HomeScreen({
                     borderRadius: 3,
                     p: 1.5,
                     bgcolor: "#fffef5",
-                    border: isSelected ? "2px solid #1976d2" : "1px solid #eee",
+                    border: isSelected ? "2px solid #0f766e" : "1px solid #e5e7eb",
                     transition: "all 0.2s ease"
                   }}
                 >
@@ -385,7 +385,7 @@ export default function HomeScreen({
                       <Button
                         size="small"
                         variant="contained"
-                        sx={{ bgcolor: isOwner ? "#1e88e5" : "#a9c7eb" }}
+                        sx={{ bgcolor: isOwner ? "#0f766e" : "#bcdad6" }}
                         startIcon={<EditIcon fontSize="small" />}
                         disabled={!isOwner}
                         onClick={() => isOwner && setEditing(playlist)}
@@ -395,7 +395,7 @@ export default function HomeScreen({
                       <Button
                         size="small"
                         variant="contained"
-                        sx={{ bgcolor: "#2e7d32" }}
+                        sx={{ bgcolor: "#0f766e" }}
                         startIcon={<ContentCopyIcon fontSize="small" />}
                         disabled={!user?.email}
                         onClick={async () => {
@@ -466,7 +466,7 @@ export default function HomeScreen({
 
                   <Typography
                     variant="body2"
-                    sx={{ mt: 1, color: "#1976d2", ml: 0.5 }}
+                    sx={{ mt: 1, color: "#0f766e", ml: 0.5 }}
                   >
                     {listeners} Listener{listeners === 1 ? "" : "s"}
                   </Typography>
