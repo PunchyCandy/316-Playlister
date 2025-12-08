@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { registerAccount, loginAccount } from "../api/authApi";
 import {
   Box,
   Paper,
@@ -13,7 +14,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
-export default function AccountScreen({ initialTab = 0, onLogin }) {
+export default function AccountScreen({ initialTab = 0, onAuthSuccess }) {
   const [tab, setTab] = useState(initialTab ?? 0);
   const handleChange = (_, newValue) => setTab(newValue);
 
@@ -26,15 +27,15 @@ export default function AccountScreen({ initialTab = 0, onLogin }) {
         </Tabs>
 
         {tab === 0 && (
-          <CreateAccountForm onRegistered={onLogin} setTab={setTab} />
+          <CreateAccountForm onAuthSuccess={onAuthSuccess} setTab={setTab} />
         )}
-        {tab === 1 && <LoginAccount onLogin={onLogin} />}
+        {tab === 1 && <LoginAccount onAuthSuccess={onAuthSuccess} />}
       </Paper>
     </Box>
   );
 }
 
-function CreateAccountForm({ onRegistered, setTab }) {
+function CreateAccountForm({ onAuthSuccess, setTab }) {
   const [values, setValues] = useState({
     username: "",
     email: "",
@@ -43,7 +44,7 @@ function CreateAccountForm({ onRegistered, setTab }) {
   });
 
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarData, setAvatarData] = useState("");
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -55,22 +56,37 @@ function CreateAccountForm({ onRegistered, setTab }) {
   const handleAvatarChange = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    setAvatarFile(file);
 
-    // simple preview
-    const url = URL.createObjectURL(file);
-    setAvatarPreview(url);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        setAvatarData(result);
+        setAvatarPreview(result);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: include avatarFile when you send data to your backend
-    if (onRegistered) {
-      onRegistered({
-        name: values.username,
+
+    if (values.password !== values.confirm) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const data = await registerAccount({
+        username: values.username,
         email: values.email,
-        avatar: avatarFile
+        password: values.password,
+        avatar: avatarData
       });
+      // data: { token, user }
+      onAuthSuccess && onAuthSuccess(data);
+    } catch (err) {
+      alert(err.message || "Failed to create account");
     }
   };
 
@@ -184,8 +200,8 @@ function CreateAccountForm({ onRegistered, setTab }) {
   );
 }
 
-function LoginAccount({ onLogin }) {
-  const [values, setValues] = useState({ username: "", password: "" });
+function LoginAccount({ onAuthSuccess }) {
+  const [values, setValues] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -194,10 +210,19 @@ function LoginAccount({ onLogin }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: call login API
-    if (onLogin) onLogin({ name: values.username });
+
+    try {
+      const data = await loginAccount({
+        email: values.email,     // or change your TextField to "email"
+        password: values.password
+      });
+      // data: { token, user }
+      onAuthSuccess && onAuthSuccess(data);
+    } catch (err) {
+      alert(err.message || "Failed to login");
+    }
   };
 
   return (
@@ -216,9 +241,9 @@ function LoginAccount({ onLogin }) {
         fullWidth
         required
         margin="normal"
-        name="username"
-        label="Username"
-        value={values.username}
+        name="email"
+        label="Email"
+        value={values.email}
         onChange={handleChange}
       />
       <TextField

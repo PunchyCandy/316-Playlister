@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline, Box } from "@mui/material";
 
@@ -7,6 +7,7 @@ import WelcomeScreen from "./components/WelcomeScreen";
 import AccountScreen from "./components/AccountScreen";
 import HomeScreen from "./components/HomeScreen";
 import SongCatalog from "./components/SongCatalog";
+import { fetchCurrentUser } from "./api/authApi";
 
 const theme = createTheme({
   palette: {
@@ -22,6 +23,35 @@ export default function App() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [accountTab, setAccountTab] = useState(0);
 
+  const TOKEN_KEY = "playlisterToken";
+
+  const [authToken, setAuthToken] = useState(
+    () => window.localStorage.getItem(TOKEN_KEY) || ""
+  );
+
+  useEffect(() => {
+    async function loadUser() {
+      if (!authToken) return;
+      try {
+        const user = await fetchCurrentUser(authToken);
+        setCurrentUser(user);
+        setCurrentScreen("home");   // or whatever your "logged-in" screen is
+      } catch (err) {
+        console.error("Failed to load current user", err);
+        setAuthToken("");
+        window.localStorage.removeItem(TOKEN_KEY);
+      }
+    }
+    loadUser();
+  }, [authToken]);
+
+  function handleAuthSuccess({ user, token }) {
+    setCurrentUser(user);
+    setAuthToken(token);
+    window.localStorage.setItem(TOKEN_KEY, token);
+    setCurrentScreen("home");
+  }
+
   const handleLogin = (user) => {
     setCurrentUser(user);
     setCurrentScreen("home");
@@ -33,6 +63,8 @@ export default function App() {
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setAuthToken("");
+    window.localStorage.removeItem(TOKEN_KEY);
     setCurrentScreen("welcome");
   };
 
@@ -83,7 +115,7 @@ export default function App() {
         {currentScreen === "account" && (
           <AccountScreen
             initialTab={accountTab}
-            onLogin={handleLogin}
+            onAuthSuccess={handleAuthSuccess}
           />
         )}
 

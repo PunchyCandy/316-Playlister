@@ -1,10 +1,9 @@
 // src/components/HomeScreen.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
   TextField,
-  IconButton,
   Typography,
   Button,
   List,
@@ -12,7 +11,8 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Stack,
-  MenuItem
+  MenuItem,
+  IconButton
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,37 +21,55 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import AddIcon from "@mui/icons-material/Add";
 
-const dummyPlaylists = [
-  { id: 1, name: "Chill Vibes", songCount: 15 },
-  { id: 2, name: "Workout", songCount: 22 },
-  { id: 3, name: "Study Focus", songCount: 10 }
-];
-
 export default function HomeScreen({
   onOpenSongCatalog,
   selectedPlaylist,
   setSelectedPlaylist
 }) {
+  // playlists from backend
+  const [playlists, setPlaylists] = useState([]);
+
+  // search + sort state
   const [searchText, setSearchText] = useState("");
   const [userFilter, setUserFilter] = useState("");
   const [songTitleFilter, setSongTitleFilter] = useState("");
-  const [sortBy, setSortBy] = useState("name-asc"); // NEW
+  const [sortBy, setSortBy] = useState("name-asc");
 
-  const filtered = dummyPlaylists.filter((p) =>
-    p.name.toLowerCase().includes(searchText.toLowerCase())
+  // ⭐ load playlists from backend ONCE when component mounts
+  useEffect(() => {
+    fetch("http://localhost:4000/api/playlists")
+      .then((res) => res.json())
+      .then((data) => {
+        setPlaylists(data || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load playlists", err);
+      });
+  }, []);
+
+  // helper: get song count whether backend sends songs[] or songCount
+  const getSongCount = (pl) =>
+    Array.isArray(pl.songs) ? pl.songs.length : pl.songCount || 0;
+
+  // simple filter (right now only by name; you can expand later)
+  const filtered = playlists.filter((p) =>
+    p.name?.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  // apply sorting
+  // apply sort
   const sorted = [...filtered].sort((a, b) => {
+    const countA = getSongCount(a);
+    const countB = getSongCount(b);
+
     switch (sortBy) {
       case "name-asc":
-        return a.name.localeCompare(b.name);
+        return (a.name || "").localeCompare(b.name || "");
       case "name-desc":
-        return b.name.localeCompare(a.name);
+        return (b.name || "").localeCompare(a.name || "");
       case "songs-desc":
-        return b.songCount - a.songCount;
+        return countB - countA;
       case "songs-asc":
-        return a.songCount - b.songCount;
+        return countA - countB;
       default:
         return 0;
     }
@@ -79,7 +97,7 @@ export default function HomeScreen({
             <TextField
               fullWidth
               label="By Playlist Name"
-              value={searchText}                     // fixed
+              value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
 
@@ -137,7 +155,7 @@ export default function HomeScreen({
         </Paper>
       </Box>
 
-      {/* RIGHT HALF – playlists + details */}
+      {/* RIGHT HALF – playlists list */}
       <Box
         sx={{
           flex: 1,
@@ -146,7 +164,6 @@ export default function HomeScreen({
           gap: 2
         }}
       >
-        {/* Playlists list */}
         <Paper sx={{ p: 2, flex: 1 }}>
           <Box
             sx={{
@@ -159,7 +176,7 @@ export default function HomeScreen({
             <Typography variant="h6">Playlists</Typography>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {/* SORT BY DROPDOWN */}
+              {/* Sort dropdown */}
               <TextField
                 select
                 size="small"
@@ -191,7 +208,7 @@ export default function HomeScreen({
               >
                 <ListItemText
                   primary={playlist.name}
-                  secondary={`${playlist.songCount} songs`}
+                  secondary={`${getSongCount(playlist)} songs`}
                 />
                 <ListItemSecondaryAction>
                   <Stack direction="row" spacing={0.5}>
@@ -213,7 +230,7 @@ export default function HomeScreen({
             ))}
           </List>
 
-          {/* Create New Playlist button at bottom */}
+          {/* Create New Playlist button */}
           <Box sx={{ mt: 2 }}>
             <Button
               variant="contained"

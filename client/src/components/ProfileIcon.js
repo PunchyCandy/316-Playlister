@@ -22,7 +22,13 @@ export default function ProfileIcon({
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
-  const initials = user?.name ? user.name[0].toUpperCase() : "?";
+  const initials = user?.username
+    ? user.username[0].toUpperCase()
+    : user?.userName
+      ? user.userName[0].toUpperCase()
+      : user?.email
+        ? user.email[0].toUpperCase()
+        : "?";
 
   const handleLogin = () => {
     handleClose();
@@ -50,7 +56,7 @@ export default function ProfileIcon({
       <IconButton color="inherit" onClick={handleOpen} size="large">
         {user ? (
           <Avatar
-            src={user.avatarUrl || undefined}
+            src={user.avatar || user.avatarUrl || undefined}
             sx={{ width: 36, height: 36 }}
           >
             {initials}
