@@ -107,4 +107,54 @@ router.get("/me", authRequired, async (req, res) => {
   });
 });
 
+// PUT /api/auth/me
+// header: Authorization: Bearer <token>
+// body: { username, email, password?, avatar? }
+router.put("/me", authRequired, async (req, res) => {
+  try {
+    const { username, email, password, avatar } = req.body;
+
+    if (!username || !email) {
+      return res.status(400).json({ error: "username and email are required" });
+    }
+
+    // ensure email uniqueness if changed
+    if (email !== req.user.email) {
+      const exists = await User.findOne({ email });
+      if (exists) {
+        return res.status(409).json({ error: "Email already in use" });
+      }
+    }
+
+    const updates = {
+      userName: username,
+      email,
+      avatar: typeof avatar === "string" ? avatar : req.user.avatar
+    };
+
+    if (password) {
+      updates.passwordHash = await bcrypt.hash(password, 10);
+    }
+
+    const updated = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true
+    });
+
+    const token = makeToken(updated);
+
+    res.json({
+      token,
+      user: {
+        _id: updated._id,
+        username: updated.userName,
+        avatar: updated.avatar,
+        email: updated.email
+      }
+    });
+  } catch (err) {
+    console.error("update me error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

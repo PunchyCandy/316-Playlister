@@ -38,3 +38,16 @@ export async function fetchCurrentUser(token) {
   });
   return handleResponse(res); // { _id, username, avatar, email, playlists }
 }
+
+// PUT /api/auth/me
+export async function updateAccount({ username, email, password, avatar, token }) {
+  const res = await fetch(`${AUTH_BASE_URL}/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ username, email, password, avatar })
+  });
+  return handleResponse(res); // { token, user }
+}

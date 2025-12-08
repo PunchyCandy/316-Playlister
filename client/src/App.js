@@ -5,6 +5,7 @@ import { CssBaseline, Box } from "@mui/material";
 import AppBanner from "./components/AppBanner";
 import WelcomeScreen from "./components/WelcomeScreen";
 import AccountScreen from "./components/AccountScreen";
+import EditAccountScreen from "./components/EditAccountScreen";
 import HomeScreen from "./components/HomeScreen";
 import SongCatalog from "./components/SongCatalog";
 import { fetchCurrentUser } from "./api/authApi";
@@ -58,6 +59,10 @@ export default function App() {
   };
 
   const handleNavigate = (screen) => {
+    if (screen === "home") {
+      setCurrentScreen(currentUser ? "home" : "welcome");
+      return;
+    }
     setCurrentScreen(screen);
   };
 
@@ -121,9 +126,19 @@ export default function App() {
 
         {currentScreen === "home" && (
           <HomeScreen
+            user={currentUser}
             onOpenSongCatalog={() => setCurrentScreen("catalog")}
             selectedPlaylist={selectedPlaylist}
             setSelectedPlaylist={setSelectedPlaylist}
+          />
+        )}
+
+        {currentScreen === "edit-account" && (
+          <EditAccountScreen
+            user={currentUser}
+            token={authToken}
+            onAuthSuccess={handleAuthSuccess}
+            onCancel={() => setCurrentScreen("home")}
           />
         )}
 
